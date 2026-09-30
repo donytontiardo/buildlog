@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body %}
+<main class="auth-wrap">
+  <form method="post" class="auth-card">
+    <h1>Buildlog</h1>
+    <p class="muted">Enter the access password to continue.</p>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <input type="password" name="password" placeholder="Password" autofocus required>
+    <button type="submit">Enter</button>
+  </form>
+</main>
+{% endblock %}

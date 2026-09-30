@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block body %}
+<header class="top">
+  <div class="title-row">
+    <div>
+      <h1>Buildlog</h1>
+      <p class="tagline">Projects, broken into tasks, tracked to done.</p>
+    </div>
+    {% if total %}
+    <div class="overall">
+      <span class="frac">{{ done }}/{{ total }}</span>
+      <div class="track"><div class="fill" style="width: {{ overall_pct }}%"></div></div>
+      <span>{{ overall_pct }}%</span>
+    </div>
+    {% endif %}
+  </div>
+  <form method="post" action="{{ url_for('main.logout') }}" class="logout-form">
+    <button type="submit" class="link-btn">Sign out</button>
+  </form>
+</header>
+
+<main>
+  <form method="post" action="{{ url_for('main.create_project') }}" class="new-project-form">
+    <input type="text" name="name" placeholder="New project name" maxlength="120" required>
+    <button type="submit">Add</button>
+  </form>
+
+  {% if not projects %}
+  <div class="empty-state">
+    <h2>No projects yet</h2>
+    <p>Start one above. Break it into tasks, check them off, and watch the bar fill in.</p>
+  </div>
+  {% endif %}
+
+  {% for project in projects %}
+  <details class="project" {% if loop.last %}open{% endif %}>
+    <summary class="project-head">
+      <div class="project-main">
+        <div class="project-name">{{ project.name }}</div>
+        <div class="progress-row">
+          <div class="track"><div class="fill {{ 'done' if project.progress.pct == 100 and project.progress.total else '' }}" style="width: {{ project.progress.pct }}%"></div></div>
+          <span class="progress-label">{{ project.progress.done }}/{{ project.progress.total }}</span>
+        </div>
+      </div>
+      <form method="post" action="{{ url_for('main.delete_project', project_id=project.id) }}" onsubmit="return confirm('Delete this project?');">
+        <button type="submit" class="icon-btn danger" title="Delete project">&times;</button>
+      </form>
+    </summary>
+
+    <div class="tasks">
+      {% for task in project.tasks %}
+      <div class="task-row">
+        <form method="post" action="{{ url_for('main.toggle_task', task_id=task.id) }}">
+          <button type="submit" class="check {{ 'checked' if task.done }}">{{ '✓' if task.done else '' }}</button>
+        </form>
+        <span class="task-text {{ 'done' if task.done }}">{{ task.text }}</span>
+        <form method="post" action="{{ url_for('main.delete_task', task_id=task.id) }}">
+          <button type="submit" class="icon-btn" title="Delete task">&times;</button>
+        </form>
+      </div>
+      {% endfor %}
+      <form method="post" action="{{ url_for('main.add_task', project_id=project.id) }}" class="add-task-row">
+        <input type="text" name="text" placeholder="Add a task" maxlength="300" required>
+        <button type="submit">Add</button>
+      </form>
+    </div>
+  </details>
+  {% endfor %}
+</main>
+{% endblock %}

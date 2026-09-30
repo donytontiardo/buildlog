@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: buildlog
+    env: docker
+    plan: free
+    envVars:
+      - key: APP_PASSWORD
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
